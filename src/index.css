@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-black text-white antialiased selection:bg-gray-800 selection:text-white;
+    margin: 0;
+  }
+}
