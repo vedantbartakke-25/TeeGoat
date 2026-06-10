@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaSpotify, FaYoutube, FaApple, FaInstagram } from 'react-icons/fa';
 import PlatformCard from '../components/PlatformCard';
@@ -27,6 +28,26 @@ const Links = () => {
       url: 'https://www.instagram.com/teegoat_?igsh=MWNwYnh0MXZxeDI4MQ==',
     },
   ];
+
+  const [scrollY, setScrollY] = useState(0);
+  const [hasScrolledPast, setHasScrolledPast] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setScrollY(currentScrollY);
+      if (currentScrollY > 100 && !hasScrolledPast) {
+        setHasScrolledPast(true);
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Run once on mount to handle initial load case
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasScrolledPast]);
+
+  const indicatorOpacity = Math.max(0, 1 - scrollY / 50);
 
   return (
     <div className="min-h-screen w-full bg-black text-white py-16 px-4 sm:px-6 lg:px-8 flex flex-col items-center relative overflow-hidden">
@@ -83,6 +104,38 @@ const Links = () => {
       <div className="w-full mt-24 border-t border-white/10 pt-4 relative z-10">
         <Gallery />
       </div>
+
+      {/* Premium Scroll Indicator */}
+      {!hasScrolledPast && (
+        <>
+          <div 
+            className="fixed bottom-0 left-0 w-full h-48 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none z-10"
+            style={{ opacity: indicatorOpacity }}
+          ></div>
+          <motion.div 
+            className="fixed bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center pointer-events-none z-20"
+            style={{ opacity: indicatorOpacity }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 1.5 }}
+          >
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+              className="text-white/70 text-xl mb-4 font-light"
+            >
+              ↓
+            </motion.div>
+            <motion.div
+              animate={{ opacity: [0.4, 0.9, 0.4] }}
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+              className="text-white/80 text-[10px] tracking-[0.4em] uppercase font-light"
+            >
+              Explore TeeGoat
+            </motion.div>
+          </motion.div>
+        </>
+      )}
 
       {/* About Section */}
       <About />
